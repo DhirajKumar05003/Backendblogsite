@@ -2,6 +2,7 @@ import uuid
 from flask import Flask, request, jsonify, send_from_directory
 import os
 import json
+from flask_cors import CORS
 
 app = Flask(__name__)
 BLOG_FILE = 'blogs.json'
@@ -25,7 +26,7 @@ def save_blogs(blogs):
 def home():
     return 'Hello, Flask is working!'
 
-@app.route('/blogs', methods=['GET'])
+@app.route('/api/blogs', methods=['GET'])
 def get_blogs():
     blogs = load_blogs()
     # Return preview: id, title, image, excerpt (first 100 chars)
@@ -40,7 +41,7 @@ def get_blogs():
     ]
     return jsonify(previews)
 
-@app.route('/blog/<blog_id>', methods=['GET'])
+@app.route('/api/blog/<blog_id>', methods=['GET'])
 def get_blog(blog_id):
     blogs = load_blogs()
     for blog in blogs:
@@ -48,7 +49,7 @@ def get_blog(blog_id):
             return jsonify(blog)
     return jsonify({'error': 'Blog not found'}), 404
 
-@app.route('/publish', methods=['POST'])
+@app.route('/api/publish', methods=['POST'])
 def publish_blog():
     if request.content_type.startswith('multipart/form-data'):
         title = request.form.get('title', '').strip()
@@ -77,7 +78,7 @@ def publish_blog():
     save_blogs(blogs)
     return jsonify({'success': True, 'message': 'Blog published.'})
 
-@app.route('/uploads/<filename>')
+@app.route('/api/uploads/<filename>')
 def uploaded_file(filename):
     return send_from_directory(UPLOAD_FOLDER, filename)
 
